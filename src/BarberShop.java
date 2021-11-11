@@ -26,7 +26,6 @@ public class BarberShop extends Application {
     SleepingPlace sleepingPlace;
     Barber barber;
 
-    StringProperty testingChange = new SimpleStringProperty("this");
 
     @Override
     public void start(Stage primaryStage) {
@@ -71,7 +70,7 @@ public class BarberShop extends Application {
                 Customer customer = new Customer();
                 if(barber.getStatus() == C.BARBER_IS_SLEEPING){
                     shavingPlace.setCustomer(customer);
-                    System.out.println(C.BARBER_IS_SLEEPING);
+                    System.out.println("BarberShop:" + C.BARBER_IS_SLEEPING);
                 }
                 else if(waitingRoom.getStatus() == C.WAITING_ROOM_IS_FULL){
                     //full

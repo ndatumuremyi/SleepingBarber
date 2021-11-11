@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 
+import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -32,7 +33,7 @@ public class WaitingRoom extends VBox{
 
     public StringProperty status = new SimpleStringProperty(C.WAITING_ROOM_HAS_FREE_PLACES);
 
-    IntegerProperty waitingPeoples = new SimpleIntegerProperty(0);
+   // IntegerProperty waitingPeoples = new SimpleIntegerProperty(0);
     Image emptyChair = new Image("emptyChair.png");
     Image takenChair = new Image("waitingCustomer.png");
     WaitingRoom(){
@@ -67,45 +68,54 @@ public class WaitingRoom extends VBox{
 
     public boolean addNewCustomer(Customer customer){
 
-        if(getChildren().size() >= maxCustomer){
+        if(isWaitingRoomFull()){
+            System.out.println("WaitingRoom: room is full");
             return false;
         }
-       repopulate();
-        waitingPeoples.setValue(waitingPeoples.getValue() + 1);
-        if(waitingPeoples.getValue() == maxCustomer){
+        customers.add(customer);
+        repopulate();
+        if(customers.size() >= maxCustomer){
             this.status.setValue(C.WAITING_ROOM_IS_FULL);
         }
-        customers.add(customer);
         return true;
     }
 
+    private boolean isWaitingRoomFull() {
+        if(maxCustomer <= customers.size()){
+            return true;
+        }
+        return false;
+    }
+
     private void repopulate() {
-        getChildren().removeAll();
-        int freeSpaces = maxCustomer - waitingPeoples.getValue();
-        int numberOfCustomerCopy = waitingPeoples.getValue();
-        while (numberOfCustomerCopy > 0){
-            ImageView takenC = new ImageView(takenChair);
-            takenC.setFitHeight(height);
-            takenC.setFitWidth(width);
-            getChildren().add(takenC);
-            numberOfCustomerCopy--;
-        }
-        while (freeSpaces > 0){
-            ImageView emptyP = new ImageView(emptyChair);
-            emptyP.setFitHeight(height);
-            emptyP.setFitWidth(width);
-            getChildren().add(emptyP);
-            freeSpaces--;
-        }
+        Platform.runLater(() -> {
+            int freeSpaces = maxCustomer - customers.size();
+            int numberOfCustomer = customers.size();
+            getChildren().clear();
+            while (numberOfCustomer > 0){
+                ImageView takenC = new ImageView(takenChair);
+                takenC.setFitHeight(height);
+                takenC.setFitWidth(width);
+                getChildren().add(takenC);
+                numberOfCustomer--;
+            }
+            while (freeSpaces > 0){
+                ImageView emptyP = new ImageView(emptyChair);
+                emptyP.setFitHeight(height);
+                emptyP.setFitWidth(width);
+                getChildren().add(emptyP);
+                freeSpaces--;
+            }
+        });
+
     }
 
     //remove customer from waiting room
     public Customer getNextCustomer(){
-        if(waitingPeoples.getValue() <= 0){
+        if(customers.size() == 0){
             return null;
 
         }
-        waitingPeoples.setValue(waitingPeoples.getValue()-1);
         repopulate();
         return customers.poll();
 
