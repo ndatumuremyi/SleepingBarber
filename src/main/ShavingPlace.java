@@ -1,3 +1,5 @@
+package main;
+
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -7,9 +9,14 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
 public class ShavingPlace extends StackPane {
     private int height = 300;
     private int width = 300;
+    // Create a new lock
+ private static Lock lock = new ReentrantLock();
 
     StringProperty status = new SimpleStringProperty(C.SHAVING_PLACE_IS_EMPTY) ;
     ImageView emptyChair;

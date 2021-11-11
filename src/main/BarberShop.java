@@ -1,20 +1,24 @@
+package main;
+
+import customerTasks.CustomerBeShaved;
+import customerTasks.CustomerEnteringTask;
+import customerTasks.CustomerLeaving;
+import customerTasks.CustomerWaitingTask;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  *
@@ -66,11 +70,19 @@ public class BarberShop extends Application {
         addNewCustomer.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                System.out.println("BarberShop: hello, new customer need to be shaved");
+                System.out.println("main.BarberShop: hello, new customer need to be shaved");
                 Customer customer = new Customer();
+
+                // Create a fixed thread pool with only 1 threads for each new customer
+                ExecutorService customerTasks = Executors.newFixedThreadPool(1);
+                customerTasks.execute(new CustomerEnteringTask(customer));
+                customerTasks.execute(new CustomerWaitingTask(customer));
+                customerTasks.execute(new CustomerBeShaved(customer));
+                customerTasks.execute(new CustomerLeaving(customer));
+
                 if(barber.getStatus() == C.BARBER_IS_SLEEPING){
                     shavingPlace.setCustomer(customer);
-                    System.out.println("BarberShop:" + C.BARBER_IS_SLEEPING);
+                    System.out.println("main.BarberShop:" + C.BARBER_IS_SLEEPING);
                 }
                 else if(waitingRoom.getStatus() == C.WAITING_ROOM_IS_FULL){
                     //full
@@ -103,19 +115,19 @@ public class BarberShop extends Application {
             public void invalidated(Observable observable) {
                 switch (barber.status.getValue()){
                     case C.BARBER_IS_SLEEPING:
-                        System.out.println("BarberShop: SLEEPING_PLACE_HAS_BARBER");
+                        System.out.println("main.BarberShop: SLEEPING_PLACE_HAS_BARBER");
                         sleepingPlace.setStatus(C.SLEEPING_PLACE_HAS_BARBER);
                         shavingPlace.setStatus(C.SHAVING_PLACE_IS_EMPTY);
 
                         break;
                     case C.BARBER_IS_SHAVING:{
-                        System.out.println("BarberShop: SLEEPING_PLACE_IS_EMPTY in barber state switch");
+                        System.out.println("main.BarberShop: SLEEPING_PLACE_IS_EMPTY in barber state switch");
                         sleepingPlace.setStatus(C.SLEEPING_PLACE_IS_EMPTY);
                         break;
                     }
                     case C.BARBER_FINISH_SHAVING:{
-                        System.out.println("BarberShop: BARBER_FINISH_SHAVING in barber state switch");
-                        //shavingPlace.setStatus(C.SHAVING_PLACE_IS_EMPTY);
+                        System.out.println("main.BarberShop: BARBER_FINISH_SHAVING in barber state switch");
+                        //shavingPlace.setStatus(main.C.SHAVING_PLACE_IS_EMPTY);
                     }
                     default:
                         break;

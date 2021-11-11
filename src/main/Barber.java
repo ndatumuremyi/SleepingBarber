@@ -1,4 +1,4 @@
-/*
+package main;/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -39,7 +39,7 @@ public class Barber extends Thread{
             public void invalidated(Observable observable) {
                 switch (status.getValue()){
                     case C.BARBER_IS_SLEEPING:
-                        System.out.println("Barber" + C.BARBER_IS_SLEEPING);
+                        System.out.println("main.Barber" + C.BARBER_IS_SLEEPING);
                         break;
 
                     case C.BARBER_IS_SHAVING: {
@@ -68,7 +68,7 @@ public class Barber extends Thread{
                     case C.BARBER_FINISH_SHAVING: {
                         if(currentShavedCustomer == null)
                         {
-                            System.out.println("Barber currentSavedCustomer is empty" );
+                            System.out.println("main.Barber currentSavedCustomer is empty" );
 
                         }
                         else {

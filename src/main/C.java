@@ -1,3 +1,5 @@
+package main;
+
 public interface C {
     String BARBER_IS_SHAVING = "BARBER_IS_SHAVING";
     String BARBER_FINISH_SHAVING = "BARBER_FINISH_SHAVING";

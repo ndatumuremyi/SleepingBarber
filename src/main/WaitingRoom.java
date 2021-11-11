@@ -1,22 +1,16 @@
-/*
+package main;/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
 
 import javafx.application.Platform;
-import javafx.beans.property.IntegerProperty;
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 
-import java.util.ArrayList;
-import java.util.Queue;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 /**
@@ -37,20 +31,17 @@ public class WaitingRoom extends VBox{
     Image emptyChair = new Image("emptyChair.png");
     Image takenChair = new Image("waitingCustomer.png");
     WaitingRoom(){
-        ImageView img1 = new ImageView(emptyChair);
-        img1.setFitHeight(height);
-        img1.setFitWidth(width);
-        ImageView img2 = new ImageView(emptyChair);
-        img2.setFitHeight(height);
-        img2.setFitWidth(width);
-        ImageView img3 = new ImageView(emptyChair);
-        img3.setFitHeight(height);
-        img3.setFitWidth(width);
-        ImageView img4 = new ImageView(emptyChair);
-        img4.setFitHeight(height);
-        img4.setFitWidth(width);
+        int maxCustomerCopy = maxCustomer;
+        while(maxCustomerCopy > 0){
+            ImageView img1 = new ImageView(emptyChair);
+            img1.setFitHeight(height);
+            img1.setFitWidth(width);
 
-        getChildren().addAll(img1,img2,img3,img4);
+            getChildren().add(img1);
+            --maxCustomerCopy;
+        }
+
+
 
     }
 
@@ -69,7 +60,7 @@ public class WaitingRoom extends VBox{
     public boolean addNewCustomer(Customer customer){
 
         if(isWaitingRoomFull()){
-            System.out.println("WaitingRoom: room is full");
+            System.out.println("main.WaitingRoom: room is full");
             return false;
         }
         customers.add(customer);

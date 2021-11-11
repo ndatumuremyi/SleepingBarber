@@ -1,4 +1,4 @@
-/*
+package main;/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -12,7 +12,8 @@ import javafx.beans.property.StringProperty;
  *
  * @author paterneN
  */
-public class Customer extends  Thread{
+public class Customer{
+    public Customer(){}
     public StringProperty status = new SimpleStringProperty(C.CUSTOMER_IS_ENTERING);
 
 

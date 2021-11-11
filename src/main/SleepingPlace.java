@@ -1,3 +1,5 @@
+package main;
+
 import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
@@ -13,7 +15,7 @@ public class SleepingPlace extends StackPane {
     public StringProperty status = new SimpleStringProperty(C.SLEEPING_PLACE_HAS_BARBER); ;
     ImageView emptyChair;
     ImageView sleeping;
-//    Barber barber;
+//    main.Barber barber;
 
 
     public String getStatus() {
