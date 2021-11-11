@@ -12,7 +12,7 @@ import javafx.beans.property.StringProperty;
  *
  * @author paterneN
  */
-public class Customer{
+public class Customer extends  Thread{
     public StringProperty status = new SimpleStringProperty(C.CUSTOMER_IS_ENTERING);
 
 

@@ -25,7 +25,7 @@ public class SleepingPlace extends StackPane {
     }
 
     public void setStatus(String status) {
-        this.status.set(status);
+        this.status.setValue(status);
     }
 
     SleepingPlace() {
@@ -41,52 +41,35 @@ public class SleepingPlace extends StackPane {
         getChildren().add(sleeping);
 
 
-//        this.barber.status.addListener(new InvalidationListener() {
-//            @Override
-//            public void invalidated(Observable observable) {
-//                switch (barber.getStatus()){
-//                    case C.BARBER_IS_SHAVING:
-//                    {
-//                        status.setValue(C.SLEEPING_PLACE_IS_EMPTY);
-//                        break;
-//                    }
-//                    case C.BARBER_IS_SLEEPING:{
-//                        status.setValue(C.SLEEPING_PLACE_HAS_BARBER);
-//                        break;
-//                    }
-//                    default:{
-//                        break;
-//                    }
-//                }
-//            }
-//        });
 
         this.status.addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
                 switch (status.getValue()){
-                    case C.SLEEPING_PLACE_HAS_BARBER:
+                    case C.SLEEPING_PLACE_HAS_BARBER: {
                         Platform.runLater(() -> {
-                            getChildren().removeAll();
+                            getChildren().clear();
                             ImageView sleeping = new ImageView(new Image("sleepingBarber.png"));
-                            sleeping.setFitWidth(140);
-                            sleeping.setFitHeight(150);
+                            sleeping.setFitWidth(width);
+                            sleeping.setFitHeight(height);
                             getChildren().add(sleeping);
                         });
                         break;
-                    default:
-
-
-
+                    }
+                    default: {
                         Platform.runLater(() -> {
-                            getChildren().removeAll();
-                            ImageView emptyChair = new ImageView(new Image("barberChair.png"));
-                            emptyChair.setFitWidth(width);
-                            emptyChair.setFitHeight(height);
-                            getChildren().add(emptyChair);
-                                });
+                            Platform.runLater(() -> {
+                                getChildren().clear();
+                                ImageView emptyChair = new ImageView(new Image("barberChair.png"));
+                                emptyChair.setFitWidth(width);
+                                emptyChair.setFitHeight(height);
+                                getChildren().add(emptyChair);
+                            });
+
+                        });
 
                         break;
+                    }
                 }
             }
         });

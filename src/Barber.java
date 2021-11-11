@@ -22,9 +22,9 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class Barber extends Thread{
     public StringProperty status = new SimpleStringProperty(C.BARBER_IS_SLEEPING);
-     int shavingTime = 2;
+     int shavingTime = 10;
      int shavingRemainingTime = 0;
-     WaitingRoom waitingRoom;
+     WaitingRoom waitingRoom; // will help us to get next customer.
      Customer currentShavedCustomer;
 
     public Barber(WaitingRoom waitingRoom){
@@ -32,22 +32,7 @@ public class Barber extends Thread{
     }
     @Override
     public void run(){
-        final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
-        final Runnable Shaving = new Runnable() {
-
-            public void run() {
-
-                System.out.println(shavingRemainingTime);
-                shavingRemainingTime--;
-
-                if (shavingRemainingTime < 0) {
-                    System.out.println("Timer Over!");
-                    status.setValue(C.BARBER_FINISH_SHAVING);
-                    scheduler.shutdown();
-                }
-            }
-        };
 
         this.status.addListener(new InvalidationListener() {
             @Override
@@ -58,19 +43,29 @@ public class Barber extends Thread{
                         break;
 
                     case C.BARBER_IS_SHAVING: {
-                        shavingRemainingTime = shavingTime;
-//                        final Runnable sleeping = new Runnable() {
-//                            @Override
-//                            public void run() {
-//                                System.out.println("goToSleep");
-//                            }
-//                        };
+                        final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+                        final Runnable Shaving = new Runnable() {
+
+                            public void run() {
+
+                                System.out.println(shavingRemainingTime);
+                                shavingRemainingTime--;
+
+                                if (shavingRemainingTime < 0) {
+                                    System.out.println("Timer Over!");
+                                    status.setValue(C.BARBER_FINISH_SHAVING);
+                                    scheduler.shutdown();
+                                }
+                            }
+                        };
+
+
+                        shavingRemainingTime = shavingTime; // reset shaving remainingTime
 
                         scheduler.scheduleAtFixedRate(Shaving, 0, 1, SECONDS);
                         break;
                     }
                     case C.BARBER_FINISH_SHAVING: {
-                        // leave when finished being shaved
                         if(currentShavedCustomer == null)
                         {
                             System.out.println("Barber currentSavedCustomer is empty" );

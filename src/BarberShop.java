@@ -38,7 +38,7 @@ public class BarberShop extends Application {
 
         sleepingPlace = new SleepingPlace();
          barber = new Barber(waitingRoom);
-        shavingPlace = new ShavingPlace(barber);
+        shavingPlace = new ShavingPlace();
 
 
 
@@ -47,25 +47,6 @@ public class BarberShop extends Application {
         barber.run();
 
         Button addNewCustomer = new Button("Add new customer");
-        addNewCustomer.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                System.out.println("hello");
-                Customer customer = new Customer();
-                if(barber.getStatus() == C.BARBER_IS_SLEEPING){
-                    shavingPlace.setCustomer(customer);
-                    System.out.println(C.BARBER_IS_SLEEPING);
-                }
-                else if(waitingRoom.getStatus() == C.WAITING_ROOM_IS_FULL){
-                    //full
-                    System.out.println("waiting room is full");
-                    return;
-                }
-                else {
-                    waitingRoom.addNewCustomer(customer);
-                }
-            }
-        });
         toolsBox.getChildren().add(addNewCustomer);
 
 
@@ -81,12 +62,34 @@ public class BarberShop extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
+
+
+        addNewCustomer.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                System.out.println("BarberShop: hello, new customer need to be shaved");
+                Customer customer = new Customer();
+                if(barber.getStatus() == C.BARBER_IS_SLEEPING){
+                    shavingPlace.setCustomer(customer);
+                    System.out.println(C.BARBER_IS_SLEEPING);
+                }
+                else if(waitingRoom.getStatus() == C.WAITING_ROOM_IS_FULL){
+                    //full
+                    System.out.println("waiting room is full");
+                    return;
+                }
+                else {
+                    waitingRoom.addNewCustomer(customer);
+                }
+            }
+        });
+
         shavingPlace.status.addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
                 switch (shavingPlace.getStatus()){
                     case C.SHAVING_PLACE_HAS_CUSTOMER: {
-                        barber.setStatus(C.BARBER_IS_SHAVING);
+                        barber.setCurrentShavedCustomer(shavingPlace.getCustomer());
                         break;
                     }
                     default:{
@@ -101,15 +104,19 @@ public class BarberShop extends Application {
             public void invalidated(Observable observable) {
                 switch (barber.status.getValue()){
                     case C.BARBER_IS_SLEEPING:
-                        sleepingPlace.setState(C.SLEEPING_PLACE_HAS_BARBER);
-//                        Platform.runLater(() -> {
-//                                toolsBox.getChildren().add(new Button("this is it "));
-//                        });
+                        System.out.println("BarberShop: SLEEPING_PLACE_HAS_BARBER");
+                        sleepingPlace.setStatus(C.SLEEPING_PLACE_HAS_BARBER);
+                        shavingPlace.setStatus(C.SHAVING_PLACE_IS_EMPTY);
 
                         break;
                     case C.BARBER_IS_SHAVING:{
+                        System.out.println("BarberShop: SLEEPING_PLACE_IS_EMPTY in barber state switch");
                         sleepingPlace.setStatus(C.SLEEPING_PLACE_IS_EMPTY);
                         break;
+                    }
+                    case C.BARBER_FINISH_SHAVING:{
+                        System.out.println("BarberShop: BARBER_FINISH_SHAVING in barber state switch");
+                        //shavingPlace.setStatus(C.SHAVING_PLACE_IS_EMPTY);
                     }
                     default:
                         break;
@@ -117,21 +124,6 @@ public class BarberShop extends Application {
             }
         });
 
-
-        testingChange.addListener(new InvalidationListener() {
-            @Override
-            public void invalidated(Observable observable) {
-                if(testingChange.getValue() == "testing"){
-                    ImageView sleeping = new ImageView(new Image("sleepingBarber.png"));
-                    sleeping.setFitWidth(140);
-                    sleeping.setFitHeight(150);
-
-                    sleepingPlace.getChildren().removeAll();
-                    sleepingPlace.getChildren().add(sleeping);
-                    System.out.println("testng works");
-                }
-            }
-        });
 
 
 

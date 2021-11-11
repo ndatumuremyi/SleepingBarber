@@ -1,3 +1,4 @@
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
@@ -10,15 +11,13 @@ public class ShavingPlace extends StackPane {
     private int height = 300;
     private int width = 300;
 
-    StringProperty status ;
+    StringProperty status = new SimpleStringProperty(C.SHAVING_PLACE_IS_EMPTY) ;
     ImageView emptyChair;
     ImageView shaving;
-    Barber barber;
 
     Customer customer ;
 
-    ShavingPlace(Barber barber) {
-        this.barber = barber;
+    ShavingPlace() {
         emptyChair = new ImageView(new Image("emptyChair.png"));
         emptyChair.setFitWidth(width);
         emptyChair.setFitHeight(height);
@@ -27,25 +26,33 @@ public class ShavingPlace extends StackPane {
         shaving.setFitWidth(width);
         shaving.setFitHeight(height);
 
-        status = new SimpleStringProperty("empty");
         getChildren().add(emptyChair);
         status.addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
                 switch (status.getValue()){
                     case C.SHAVING_PLACE_HAS_CUSTOMER: {
-                        getChildren().removeAll();
-                        getChildren().add(shaving);
-                        barber.setCurrentShavedCustomer(customer);
-                        System.out.println(C.SHAVING_PLACE_HAS_CUSTOMER);
+                        Platform.runLater(() -> {
+                            System.out.println("Shaving place: SHAVING_PLACE_HAS_CUSTOMER");
+                            ImageView shaving = new ImageView(new Image("shavingBarber.png"));
+                            shaving.setFitWidth(width);
+                            shaving.setFitHeight(height);
+                            getChildren().clear();
+                            getChildren().add(shaving);
+                        });
+                        System.out.println("Shaving Place "+C.SHAVING_PLACE_HAS_CUSTOMER);
                         break;
                     }
                     default:
                         //for empty and others
-                        getChildren().removeAll();
-                        getChildren().add(emptyChair);
-
-                        System.out.println(C.SHAVING_PLACE_IS_EMPTY);
+                        Platform.runLater(() -> {
+                            ImageView emptyChair = new ImageView(new Image("emptyChair.png"));
+                            emptyChair.setFitWidth(width);
+                            emptyChair.setFitHeight(height);
+                            getChildren().clear();
+                            getChildren().add(emptyChair);
+                        });
+                        System.out.println("Shaving Place " + C.SHAVING_PLACE_IS_EMPTY);
                         break;
                 }
             }
