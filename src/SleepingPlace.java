@@ -1,3 +1,4 @@
+import javafx.application.Platform;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
@@ -59,6 +60,36 @@ public class SleepingPlace extends StackPane {
 //                }
 //            }
 //        });
+
+        this.status.addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                switch (status.getValue()){
+                    case C.SLEEPING_PLACE_HAS_BARBER:
+                        Platform.runLater(() -> {
+                            getChildren().removeAll();
+                            ImageView sleeping = new ImageView(new Image("sleepingBarber.png"));
+                            sleeping.setFitWidth(140);
+                            sleeping.setFitHeight(150);
+                            getChildren().add(sleeping);
+                        });
+                        break;
+                    default:
+
+
+
+                        Platform.runLater(() -> {
+                            getChildren().removeAll();
+                            ImageView emptyChair = new ImageView(new Image("barberChair.png"));
+                            emptyChair.setFitWidth(width);
+                            emptyChair.setFitHeight(height);
+                            getChildren().add(emptyChair);
+                                });
+
+                        break;
+                }
+            }
+        });
     }
     public void setState(String state){
         status.setValue(state);

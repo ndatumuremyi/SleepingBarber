@@ -116,31 +116,7 @@ public class BarberShop extends Application {
                 }
             }
         });
-        sleepingPlace.status.addListener(new InvalidationListener() {
-            @Override
-            public void invalidated(Observable observable) {
-                switch (sleepingPlace.status.getValue()){
-                    case C.SLEEPING_PLACE_HAS_BARBER:
-                        testingChange.setValue("testing");
-//                        ImageView sleeping = new ImageView(new Image("sleepingBarber.png"));
-//                        sleeping.setFitWidth(140);
-//                        sleeping.setFitHeight(150);
-//
-//                        sleepingPlace.getChildren().removeAll();
-//                        sleepingPlace.getChildren().add(sleeping);
-                        break;
-                    default:
-//                        testingChange.setValue("testing");
-                        //for empty and others
-//                        ImageView emptyChair = new ImageView(new Image("barberChair.png"));
-//                        emptyChair.setFitWidth(140);
-//                        emptyChair.setFitHeight(250);
-//                        sleepingPlace.getChildren().removeAll();
-//                        sleepingPlace.getChildren().add(emptyChair);
-                        break;
-                }
-            }
-        });
+
 
         testingChange.addListener(new InvalidationListener() {
             @Override
