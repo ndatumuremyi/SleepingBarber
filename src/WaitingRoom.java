@@ -117,6 +117,9 @@ public class WaitingRoom extends VBox{
 
         }
         repopulate();
+        if(status.getValue() ==C.WAITING_ROOM_IS_FULL){
+            status.setValue(C.WAITING_ROOM_HAS_FREE_PLACES);
+        }
         return customers.poll();
 
     }
