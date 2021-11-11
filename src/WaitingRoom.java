@@ -6,9 +6,17 @@
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+
+import java.util.ArrayList;
+import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  *
@@ -18,7 +26,11 @@ public class WaitingRoom extends VBox{
     private int height = 120;
     private int width = 120;
 
-    private int full = 4;
+    private int maxCustomer = 4;
+
+    public LinkedBlockingQueue<Customer> customers = new LinkedBlockingQueue<>();
+
+    public StringProperty status = new SimpleStringProperty(C.WAITING_ROOM_HAS_FREE_PLACES);
 
     IntegerProperty waitingPeoples = new SimpleIntegerProperty(0);
     Image emptyChair = new Image("emptyChair.png");
@@ -40,26 +52,62 @@ public class WaitingRoom extends VBox{
         getChildren().addAll(img1,img2,img3,img4);
 
     }
-    public boolean addNewCustomer(){
-//        if(getChildren().size() == full){
-//            return false;
-//        }
-        ImageView newCustomer = new ImageView(takenChair);
-        newCustomer.setFitHeight(height);
-        newCustomer.setFitWidth(width);
-        getChildren().add(newCustomer);
+
+    public String getStatus() {
+        return status.getValue();
+    }
+
+    public StringProperty statusProperty() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status.setValue(status);
+    }
+
+    public boolean addNewCustomer(Customer customer){
+
+        if(getChildren().size() >= maxCustomer){
+            return false;
+        }
+       repopulate();
         waitingPeoples.setValue(waitingPeoples.getValue() + 1);
+        if(waitingPeoples.getValue() == maxCustomer){
+            this.status.setValue(C.WAITING_ROOM_IS_FULL);
+        }
+        customers.add(customer);
         return true;
     }
+
+    private void repopulate() {
+        getChildren().removeAll();
+        int freeSpaces = maxCustomer - waitingPeoples.getValue();
+        int numberOfCustomerCopy = waitingPeoples.getValue();
+        while (numberOfCustomerCopy > 0){
+            ImageView takenC = new ImageView(takenChair);
+            takenC.setFitHeight(height);
+            takenC.setFitWidth(width);
+            getChildren().add(takenC);
+            numberOfCustomerCopy--;
+        }
+        while (freeSpaces > 0){
+            ImageView emptyP = new ImageView(emptyChair);
+            emptyP.setFitHeight(height);
+            emptyP.setFitWidth(width);
+            getChildren().add(emptyP);
+            freeSpaces--;
+        }
+    }
+
     //remove customer from waiting room
-    public boolean getNextCustomer(){
-        if(getChildren().size() <= 3){
-            return false;
+    public Customer getNextCustomer(){
+        if(waitingPeoples.getValue() <= 0){
+            return null;
 
         }
-        getChildren().remove((getChildren().size()-1));
         waitingPeoples.setValue(waitingPeoples.getValue()-1);
-        return true;
+        repopulate();
+        return customers.poll();
 
     }
     

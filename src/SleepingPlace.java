@@ -9,11 +9,26 @@ import javafx.scene.layout.StackPane;
 public class SleepingPlace extends StackPane {
     private int height = 150;
     private int width = 350;
-    StringProperty status ;
+    public StringProperty status = new SimpleStringProperty(C.SLEEPING_PLACE_HAS_BARBER); ;
     ImageView emptyChair;
     ImageView sleeping;
+//    Barber barber;
+
+
+    public String getStatus() {
+        return status.get();
+    }
+
+    public StringProperty statusProperty() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status.set(status);
+    }
 
     SleepingPlace() {
+
         emptyChair = new ImageView(new Image("barberChair.png"));
         emptyChair.setFitWidth(width);
         emptyChair.setFitHeight(height);
@@ -22,24 +37,28 @@ public class SleepingPlace extends StackPane {
         sleeping.setFitWidth(width);
         sleeping.setFitHeight(height);
 
-        status = new SimpleStringProperty("sleeping");
         getChildren().add(sleeping);
-        status.addListener(new InvalidationListener() {
-            @Override
-            public void invalidated(Observable observable) {
-                switch (status.getValue()){
-                    case "sleeping":
-                        getChildren().removeAll();
-                        getChildren().add(sleeping);
-                        break;
-                    default:
-                        //for empty and others
-                        getChildren().removeAll();
-                        getChildren().add(emptyChair);
-                        break;
-                }
-            }
-        });
+
+
+//        this.barber.status.addListener(new InvalidationListener() {
+//            @Override
+//            public void invalidated(Observable observable) {
+//                switch (barber.getStatus()){
+//                    case C.BARBER_IS_SHAVING:
+//                    {
+//                        status.setValue(C.SLEEPING_PLACE_IS_EMPTY);
+//                        break;
+//                    }
+//                    case C.BARBER_IS_SLEEPING:{
+//                        status.setValue(C.SLEEPING_PLACE_HAS_BARBER);
+//                        break;
+//                    }
+//                    default:{
+//                        break;
+//                    }
+//                }
+//            }
+//        });
     }
     public void setState(String state){
         status.setValue(state);

@@ -5,17 +5,26 @@
  */
 
 
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
 /**
  *
  * @author paterneN
  */
-public class Customer extends Thread{
-    private int id;
-    private static int counter = 0;
-    String status;
-    @Override
-    public void run(){
+public class Customer{
+    public StringProperty status = new SimpleStringProperty(C.CUSTOMER_IS_ENTERING);
 
+
+    public String getStatus() {
+        return status.getValue();
     }
-    
+
+    public StringProperty statusProperty() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status.setValue(status);
+    }
 }
