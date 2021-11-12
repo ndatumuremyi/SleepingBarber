@@ -15,8 +15,8 @@ import javafx.beans.property.StringProperty;
  * @author paterneN
  */
 
-public class Barber extends Thread{
-    public StringProperty status = new SimpleStringProperty(C.BARBER_IS_SLEEPING);
+public class Barber{
+    public String status = C.BARBER_IS_SLEEPING;
     int shavingTime = 10;
     int shavingRemainingTime = 0;
     WaitingRoom waitingRoom; // will help us to get next customer.
@@ -32,65 +32,22 @@ public class Barber extends Thread{
         this.sleepingPlace = sleepingPlace;
 
     }
-    @Override
-    public void run(){
-
-        this.status.addListener(new InvalidationListener() {
-            @Override
-            public void invalidated(Observable observable) {
-                switch (status.getValue()){
-                    case C.BARBER_IS_SLEEPING:
-
-                        System.out.println("main.Barber" + C.BARBER_IS_SLEEPING);
-                        break;
-
-                    case C.BARBER_IS_SHAVING: {
-                        currentShavedCustomer.setStatus(C.CUSTOMER_IS_BEING_SHAVED);
-
-//                        final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-//                        final Runnable Shaving = new Runnable() {
-//
-//                            public void run() {
-//
-//                                System.out.println(shavingRemainingTime);
-//                                shavingRemainingTime--;
-//
-//                                if (shavingRemainingTime < 0) {
-//                                    System.out.println("Timer Over!");
-//                                    status.setValue(C.BARBER_FINISH_SHAVING);
-//                                    scheduler.shutdown();
-//                                }
-//                            }
-//                        };
-//
-//
-//                        shavingRemainingTime = shavingTime; // reset shaving remainingTime
-//
-//                        scheduler.scheduleAtFixedRate(Shaving, 0, 1, SECONDS);
-                        break;
-                    }
-                    case C.BARBER_FINISH_SHAVING: {
-
-                        break;
-                    }
-                    default:
-                        break;
-                }
-            }
-        });
-
-
-
-
+    public boolean isThereOtherCustomer(){
+        if(this.waitingRoom.getNumberOfCustomersWaiting() == 0){
+            return false;
+        }
+        else {
+            return true;
+        }
     }
 
     public String getStatus() {
-        return status.getValue();
+        return status;
     }
 
 
     public void setStatus(String status) {
-        this.status.setValue(status);
+        this.status=status;
     }
 
     public int getShavingTime() {
@@ -103,7 +60,7 @@ public class Barber extends Thread{
 
     public void setCurrentShavedCustomer(Customer currentShavedCustomer) {
         this.currentShavedCustomer = currentShavedCustomer;
-        this.status.setValue(C.BARBER_IS_SHAVING);
+        this.setStatus(C.BARBER_IS_SHAVING);
 
     }
     public void startSleeping(){
@@ -112,10 +69,13 @@ public class Barber extends Thread{
         sleepingPlace.addBarber();
     }
     public void startShaving(){
+        setStatus(C.BARBER_IS_SHAVING);
+        currentShavedCustomer.setStatus(C.CUSTOMER_IS_BEING_SHAVED);
         shavingPlace.addBarberAndCustomer();
         sleepingPlace.removeBarber();
     }
     public void finishShaving(){
+        setStatus(C.BARBER_FINISH_SHAVING);
         if(currentShavedCustomer != null){
             currentShavedCustomer.startLeaving();
         }

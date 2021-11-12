@@ -2,8 +2,6 @@ package main;
 
 import barberTasks.BarberTasks;
 import customerTasks.*;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;

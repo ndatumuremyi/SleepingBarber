@@ -121,22 +121,27 @@ public class WaitingRoom extends VBox{
     }
 
     //remove customer from waiting room
+    public int getNumberOfCustomersWaiting(){
+        return customers.size();
+    }
     public Customer getNextCustomer(){
         lock.lock();
+        try {
         if(customers.size() == 0){
             return null;
 
         }
         repopulate();
         if(status.getValue() ==C.WAITING_ROOM_IS_FULL){
-            try {
+
                 status.setValue(C.WAITING_ROOM_HAS_FREE_PLACES);
                 roomIsFullCondition.signalAll();
-            } finally {
-                lock.unlock(); // Release the lock
-            }
 
 
+
+        }
+        } finally {
+            lock.unlock(); // Release the lock
         }
         return customers.poll();
 
