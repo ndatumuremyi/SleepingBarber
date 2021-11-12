@@ -14,18 +14,24 @@ import javafx.beans.property.StringProperty;
  */
 public class Customer{
     public Customer(){}
-    public StringProperty status = new SimpleStringProperty(C.CUSTOMER_IS_ENTERING);
+    public String status = C.CUSTOMER_IS_ENTERING;
 
 
     public String getStatus() {
-        return status.getValue();
-    }
-
-    public StringProperty statusProperty() {
         return status;
     }
 
+
+
     public void setStatus(String status) {
-        this.status.setValue(status);
+        this.status=status;
+    }
+
+    public void startLeaving() {
+        setStatus(C.CUSTOMER_IS_LEAVING);
+    }
+
+    public void startBeingShaved() {
+        setStatus(C.CUSTOMER_IS_BEING_SHAVED);
     }
 }

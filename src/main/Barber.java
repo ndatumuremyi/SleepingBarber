@@ -4,19 +4,10 @@ package main;/*
  * and open the template in the editor.
  */
 
-import barberTasks.FinishShavingTask;
-import barberTasks.ShavingTask;
-import barberTasks.SleepingTask;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-
-import static java.util.concurrent.TimeUnit.SECONDS;
 
 
 /**
@@ -26,15 +17,20 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class Barber extends Thread{
     public StringProperty status = new SimpleStringProperty(C.BARBER_IS_SLEEPING);
-     int shavingTime = 10;
-     int shavingRemainingTime = 0;
-     WaitingRoom waitingRoom; // will help us to get next customer.
-     Customer currentShavedCustomer;
+    int shavingTime = 10;
+    int shavingRemainingTime = 0;
+    WaitingRoom waitingRoom; // will help us to get next customer.
+    Customer currentShavedCustomer;
+    ShavingPlace shavingPlace;
+    SleepingPlace sleepingPlace;
 
 
 
-    public Barber(WaitingRoom waitingRoom){
+    public Barber(WaitingRoom waitingRoom, SleepingPlace sleepingPlace, ShavingPlace shavingPlace){
         this.waitingRoom = waitingRoom;
+        this.shavingPlace = shavingPlace;
+        this.sleepingPlace = sleepingPlace;
+
     }
     @Override
     public void run(){
@@ -74,25 +70,7 @@ public class Barber extends Thread{
                         break;
                     }
                     case C.BARBER_FINISH_SHAVING: {
-                        if(currentShavedCustomer != null){
-                            currentShavedCustomer.setStatus(C.CUSTOMER_IS_LEAVING);
-                        }
 
-
-
-                        //take new customer
-
-                        System.out.println("testing" + currentShavedCustomer);
-                        currentShavedCustomer = waitingRoom.getNextCustomer();
-                        System.out.println("testing" + currentShavedCustomer);
-                        if (currentShavedCustomer== null) {
-                            status.setValue(C.BARBER_IS_SLEEPING);
-                            System.out.println("Barber: barber got to sleep");
-
-                        } else {
-                            currentShavedCustomer.setStatus(C.CUSTOMER_IS_BEING_SHAVED);
-                            status.setValue(C.BARBER_IS_SHAVING);
-                        }
                         break;
                     }
                     default:
@@ -127,5 +105,35 @@ public class Barber extends Thread{
         this.currentShavedCustomer = currentShavedCustomer;
         this.status.setValue(C.BARBER_IS_SHAVING);
 
+    }
+    public void startSleeping(){
+        setStatus(C.BARBER_IS_SLEEPING);
+        shavingPlace.removeBarberAndCustomer();
+        sleepingPlace.addBarber();
+    }
+    public void startShaving(){
+        shavingPlace.addBarberAndCustomer();
+        sleepingPlace.removeBarber();
+    }
+    public void finishShaving(){
+        if(currentShavedCustomer != null){
+            currentShavedCustomer.startLeaving();
+        }
+
+
+
+        //take new customer
+
+        System.out.println("testing" + currentShavedCustomer);
+        currentShavedCustomer = waitingRoom.getNextCustomer();
+        System.out.println("testing" + currentShavedCustomer);
+        if (currentShavedCustomer== null) {
+            startSleeping();
+            System.out.println("Barber: barber got to sleep");
+
+        } else {
+            currentShavedCustomer.startBeingShaved();
+            startShaving();
+        }
     }
 }

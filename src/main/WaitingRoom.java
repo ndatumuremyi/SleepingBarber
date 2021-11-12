@@ -32,10 +32,10 @@ public class WaitingRoom extends VBox{
     // Create a new lock
     private static Lock lock = new ReentrantLock();
 
-         // Create a condition
+    // Create a condition
     private static Condition roomIsFullCondition = lock.newCondition();
 
-   // IntegerProperty waitingPeoples = new SimpleIntegerProperty(0);
+    // IntegerProperty waitingPeoples = new SimpleIntegerProperty(0);
     Image emptyChair = new Image("emptyChair.png");
     Image takenChair = new Image("waitingCustomer.png");
     WaitingRoom(){
@@ -76,11 +76,11 @@ public class WaitingRoom extends VBox{
 
         }
         catch (InterruptedException ex) {
-             ex.printStackTrace();
-             }
-         finally {
-             lock.unlock(); // Release the lock
-             }
+            ex.printStackTrace();
+        }
+        finally {
+            lock.unlock(); // Release the lock
+        }
 
         customers.add(customer);
         customer.setStatus(C.CUSTOMER_IS_WAITING);
@@ -141,6 +141,6 @@ public class WaitingRoom extends VBox{
         return customers.poll();
 
     }
-    
-    
+
+
 }
