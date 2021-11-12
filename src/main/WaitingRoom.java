@@ -12,6 +12,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *
@@ -26,6 +29,11 @@ public class WaitingRoom extends VBox{
     public LinkedBlockingQueue<Customer> customers = new LinkedBlockingQueue<>();
 
     public StringProperty status = new SimpleStringProperty(C.WAITING_ROOM_HAS_FREE_PLACES);
+    // Create a new lock
+    private static Lock lock = new ReentrantLock();
+
+         // Create a condition
+    private static Condition roomIsFullCondition = lock.newCondition();
 
    // IntegerProperty waitingPeoples = new SimpleIntegerProperty(0);
     Image emptyChair = new Image("emptyChair.png");
@@ -57,18 +65,29 @@ public class WaitingRoom extends VBox{
         this.status.setValue(status);
     }
 
-    public boolean addNewCustomer(Customer customer){
+    public void addNewCustomer(Customer customer){
 
-        if(isWaitingRoomFull()){
-            System.out.println("main.WaitingRoom: room is full");
-            return false;
+        lock.lock();
+        try {
+            if (status.getValue() == C.WAITING_ROOM_IS_FULL){
+                System.out.println("main.WaitingRoom: room is full");
+                roomIsFullCondition.await();
+            }
+
         }
+        catch (InterruptedException ex) {
+             ex.printStackTrace();
+             }
+         finally {
+             lock.unlock(); // Release the lock
+             }
+
         customers.add(customer);
+        customer.setStatus(C.CUSTOMER_IS_WAITING);
         repopulate();
         if(customers.size() >= maxCustomer){
             this.status.setValue(C.WAITING_ROOM_IS_FULL);
         }
-        return true;
     }
 
     private boolean isWaitingRoomFull() {
@@ -103,13 +122,21 @@ public class WaitingRoom extends VBox{
 
     //remove customer from waiting room
     public Customer getNextCustomer(){
+        lock.lock();
         if(customers.size() == 0){
             return null;
 
         }
         repopulate();
         if(status.getValue() ==C.WAITING_ROOM_IS_FULL){
-            status.setValue(C.WAITING_ROOM_HAS_FREE_PLACES);
+            try {
+                status.setValue(C.WAITING_ROOM_HAS_FREE_PLACES);
+                roomIsFullCondition.signalAll();
+            } finally {
+                lock.unlock(); // Release the lock
+            }
+
+
         }
         return customers.poll();
 

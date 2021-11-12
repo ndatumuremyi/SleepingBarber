@@ -4,11 +4,15 @@ package main;/*
  * and open the template in the editor.
  */
 
+import barberTasks.FinishShavingTask;
+import barberTasks.ShavingTask;
+import barberTasks.SleepingTask;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -27,60 +31,63 @@ public class Barber extends Thread{
      WaitingRoom waitingRoom; // will help us to get next customer.
      Customer currentShavedCustomer;
 
+
+
     public Barber(WaitingRoom waitingRoom){
         this.waitingRoom = waitingRoom;
     }
     @Override
     public void run(){
 
-
         this.status.addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
                 switch (status.getValue()){
                     case C.BARBER_IS_SLEEPING:
+
                         System.out.println("main.Barber" + C.BARBER_IS_SLEEPING);
                         break;
 
                     case C.BARBER_IS_SHAVING: {
-                        final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-                        final Runnable Shaving = new Runnable() {
+                        currentShavedCustomer.setStatus(C.CUSTOMER_IS_BEING_SHAVED);
 
-                            public void run() {
-
-                                System.out.println(shavingRemainingTime);
-                                shavingRemainingTime--;
-
-                                if (shavingRemainingTime < 0) {
-                                    System.out.println("Timer Over!");
-                                    status.setValue(C.BARBER_FINISH_SHAVING);
-                                    scheduler.shutdown();
-                                }
-                            }
-                        };
-
-
-                        shavingRemainingTime = shavingTime; // reset shaving remainingTime
-
-                        scheduler.scheduleAtFixedRate(Shaving, 0, 1, SECONDS);
+//                        final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+//                        final Runnable Shaving = new Runnable() {
+//
+//                            public void run() {
+//
+//                                System.out.println(shavingRemainingTime);
+//                                shavingRemainingTime--;
+//
+//                                if (shavingRemainingTime < 0) {
+//                                    System.out.println("Timer Over!");
+//                                    status.setValue(C.BARBER_FINISH_SHAVING);
+//                                    scheduler.shutdown();
+//                                }
+//                            }
+//                        };
+//
+//
+//                        shavingRemainingTime = shavingTime; // reset shaving remainingTime
+//
+//                        scheduler.scheduleAtFixedRate(Shaving, 0, 1, SECONDS);
                         break;
                     }
                     case C.BARBER_FINISH_SHAVING: {
-                        if(currentShavedCustomer == null)
-                        {
-                            System.out.println("main.Barber currentSavedCustomer is empty" );
-
-                        }
-                        else {
-                            System.out.println("current user status " + currentShavedCustomer.getStatus());
+                        if(currentShavedCustomer != null){
                             currentShavedCustomer.setStatus(C.CUSTOMER_IS_LEAVING);
                         }
 
 
+
                         //take new customer
+
+                        System.out.println("testing" + currentShavedCustomer);
                         currentShavedCustomer = waitingRoom.getNextCustomer();
+                        System.out.println("testing" + currentShavedCustomer);
                         if (currentShavedCustomer== null) {
                             status.setValue(C.BARBER_IS_SLEEPING);
+                            System.out.println("Barber: barber got to sleep");
 
                         } else {
                             currentShavedCustomer.setStatus(C.CUSTOMER_IS_BEING_SHAVED);
@@ -117,7 +124,8 @@ public class Barber extends Thread{
     }
 
     public void setCurrentShavedCustomer(Customer currentShavedCustomer) {
-        this.setStatus(C.BARBER_IS_SHAVING);
         this.currentShavedCustomer = currentShavedCustomer;
+        this.status.setValue(C.BARBER_IS_SHAVING);
+
     }
 }
