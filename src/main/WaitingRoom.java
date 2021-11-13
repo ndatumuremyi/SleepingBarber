@@ -5,9 +5,11 @@ package main;/*
  */
 
 import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.locks.Condition;
@@ -18,11 +20,13 @@ import java.util.concurrent.locks.ReentrantLock;
  *
  * @author paterneN
  */
-public class WaitingRoom extends VBox{
+public class WaitingRoom extends HBox {
     private int height = 120;
-    private int width = 120;
+    private int heightSit = 200;
+    private int width = 130;
 
     private int maxCustomer = 4;
+    IntegerProperty peopleThatAreOutSide = new SimpleIntegerProperty(0);
 
     public LinkedBlockingQueue<Customer> customers = new LinkedBlockingQueue<>();
 
@@ -34,7 +38,7 @@ public class WaitingRoom extends VBox{
     private static Condition roomIsFullCondition = lock.newCondition();
 
     // IntegerProperty waitingPeoples = new SimpleIntegerProperty(0);
-    Image emptyChair = new Image("emptyChair.png");
+    Image emptyChair = new Image("emptyChairWaiting.png");
     Image takenChair = new Image("waitingCustomer.png");
     WaitingRoom(){
         int maxCustomerCopy = maxCustomer;
@@ -66,6 +70,7 @@ public class WaitingRoom extends VBox{
         try {
             if (status == C.WAITING_ROOM_IS_FULL){
                 System.out.println("main.WaitingRoom: room is full");
+                setPeopleThatAreOutSide(getPeopleThatAreOutSide()+1);
                 roomIsFullCondition.await();
             }
 
@@ -99,7 +104,7 @@ public class WaitingRoom extends VBox{
             getChildren().clear();
             while (numberOfCustomer > 0){
                 ImageView takenC = new ImageView(takenChair);
-                takenC.setFitHeight(height);
+                takenC.setFitHeight(heightSit);
                 takenC.setFitWidth(width);
                 getChildren().add(takenC);
                 numberOfCustomer--;
@@ -122,19 +127,22 @@ public class WaitingRoom extends VBox{
     public Customer getNextCustomer(){
         lock.lock();
         try {
-        if(customers.size() == 0){
-            return null;
+            if(customers.size() == 0){
+                return null;
 
-        }
-        repopulate();
-        if(status ==C.WAITING_ROOM_IS_FULL){
+            }
+            repopulate();
+            if(status ==C.WAITING_ROOM_IS_FULL){
 
                 setStatus(C.WAITING_ROOM_HAS_FREE_PLACES);
+
+                if (getPeopleThatAreOutSide() != 0)
+                    setPeopleThatAreOutSide(getPeopleThatAreOutSide()-1);
                 roomIsFullCondition.signal();
 
 
 
-        }
+            }
         } finally {
             lock.unlock(); // Release the lock
         }
@@ -142,5 +150,15 @@ public class WaitingRoom extends VBox{
 
     }
 
+    public int getPeopleThatAreOutSide() {
+        return peopleThatAreOutSide.getValue();
+    }
 
+    public IntegerProperty peopleThatAreOutSideProperty() {
+        return peopleThatAreOutSide;
+    }
+
+    public void setPeopleThatAreOutSide(int peopleThatAreOutSide) {
+        this.peopleThatAreOutSide.setValue(peopleThatAreOutSide);
+    }
 }

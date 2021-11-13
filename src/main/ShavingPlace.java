@@ -10,7 +10,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class ShavingPlace extends StackPane {
     private int height = 300;
-    private int width = 300;
+    private int widthEmpty = 310;
+    private int WidthShaving = 396;
     // Create a new lock
     private static Lock lock = new ReentrantLock();
 
@@ -22,11 +23,11 @@ public class ShavingPlace extends StackPane {
 
     ShavingPlace() {
         emptyChair = new ImageView(new Image("emptyChair.png"));
-        emptyChair.setFitWidth(width);
+        emptyChair.setFitWidth(widthEmpty);
         emptyChair.setFitHeight(height);
 
         shaving = new ImageView(new Image("shavingBarber.png"));
-        shaving.setFitWidth(width);
+        shaving.setFitWidth(WidthShaving);
         shaving.setFitHeight(height);
 
         getChildren().add(emptyChair);
@@ -57,7 +58,7 @@ public class ShavingPlace extends StackPane {
         setStatus(C.SHAVING_PLACE_IS_EMPTY);
         Platform.runLater(() -> {
             ImageView emptyChair = new ImageView(new Image("emptyChair.png"));
-            emptyChair.setFitWidth(width);
+            emptyChair.setFitWidth(widthEmpty);
             emptyChair.setFitHeight(height);
             getChildren().clear();
             getChildren().add(emptyChair);
@@ -70,7 +71,7 @@ public class ShavingPlace extends StackPane {
         Platform.runLater(() -> {
             System.out.println("Shaving place: SHAVING_PLACE_HAS_CUSTOMER");
             ImageView shaving = new ImageView(new Image("shavingBarber.png"));
-            shaving.setFitWidth(width);
+            shaving.setFitWidth(WidthShaving);
             shaving.setFitHeight(height);
             getChildren().clear();
             getChildren().add(shaving);

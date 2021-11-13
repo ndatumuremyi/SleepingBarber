@@ -4,11 +4,9 @@ package main;/*
  * and open the template in the editor.
  */
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 
 /**
  *
@@ -18,7 +16,8 @@ import javafx.beans.property.StringProperty;
 public class Barber{
     public String status = C.BARBER_IS_SLEEPING;
     int shavingTime = 10;
-    int shavingRemainingTime = 0;
+    private IntegerProperty shavingRemainingTime = new SimpleIntegerProperty(0);
+    IntegerProperty sleepingTime = new SimpleIntegerProperty(0);
     WaitingRoom waitingRoom; // will help us to get next customer.
     Customer currentShavedCustomer;
     ShavingPlace shavingPlace;
@@ -32,6 +31,31 @@ public class Barber{
         this.sleepingPlace = sleepingPlace;
 
     }
+
+    public int getSleepingTime() {
+        return sleepingTime.getValue();
+    }
+
+    public IntegerProperty sleepingTimeProperty() {
+        return sleepingTime;
+    }
+
+    public void setSleepingTime(int sleepingTime) {
+        this.sleepingTime.setValue(sleepingTime);
+    }
+
+    public int getShavingRemainingTime() {
+        return shavingRemainingTime.getValue();
+    }
+
+    public IntegerProperty shavingRemainingTimeProperty() {
+        return shavingRemainingTime;
+    }
+
+    public void setShavingRemainingTime(int shavingRemainingTime) {
+        this.shavingRemainingTime.setValue(shavingRemainingTime);
+    }
+
     public boolean isThereOtherCustomer(){
         if(this.waitingRoom.getNumberOfCustomersWaiting() == 0){
             return false;

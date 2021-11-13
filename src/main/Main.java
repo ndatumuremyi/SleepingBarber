@@ -2,6 +2,8 @@ package main;
 
 import barberTasks.BarberTasks;
 import customerTasks.*;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -13,6 +15,7 @@ public class Main implements Runnable {
     Button addNewCustomer;
     ShavingPlace shavingPlace;
     SleepingPlace sleepingPlace;
+    BarberShop barberShop;
 
     @Override
     public void run() {
@@ -40,38 +43,33 @@ public class Main implements Runnable {
         });
 
 
-//        barber.status.addListener(new InvalidationListener() {
-//            @Override
-//            public void invalidated(Observable observable) {
-//                switch (barber.status.getValue()){
-//                    case C.BARBER_IS_SLEEPING:
-//
-//                        System.out.println("main.BarberShop: SLEEPING_PLACE_HAS_BARBER");
-//                        sleepingPlace.setStatus(C.SLEEPING_PLACE_HAS_BARBER);
-//                        shavingPlace.setStatus(C.SHAVING_PLACE_IS_EMPTY);
-//
-//                        break;
-//                    case C.BARBER_IS_SHAVING:{
-//                        sleepingPlace.setStatus(C.SLEEPING_PLACE_IS_EMPTY);
-//                        shavingPlace.setStatus(C.SHAVING_PLACE_HAS_CUSTOMER);
-//
-//                        System.out.println("main.BarberShop: SLEEPING_PLACE_IS_EMPTY in barber state switch");
-//
-//                        break;
-//                    }
-//                    default:
-//                        break;
-//                }
-//            }
-//        });
 
 
+        this.barber.shavingRemainingTimeProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                barberShop.updateShavingTime(barber.getShavingRemainingTime());
+            }
+        });
+        this.barber.sleepingTimeProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                barberShop.updateSleepingTime(barber.getSleepingTime());
+            }
+        });
+        this.waitingRoom.peopleThatAreOutSideProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                barberShop.updatePeopleOutside(waitingRoom.getPeopleThatAreOutSide());
+            }
+        });
 
 
 
         System.out.println("start Ending");
     }
-    Main(WaitingRoom waitingRoom,SleepingPlace sleepingPlace, ShavingPlace shavingPlace, Button addNewCustomer ){
+    Main(WaitingRoom waitingRoom,SleepingPlace sleepingPlace, ShavingPlace shavingPlace, Button addNewCustomer, BarberShop barberShop ){
+        this.barberShop = barberShop;
         this.sleepingPlace = sleepingPlace;
         this.shavingPlace = shavingPlace;
         this.addNewCustomer = addNewCustomer;
