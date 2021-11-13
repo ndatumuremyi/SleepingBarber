@@ -5,8 +5,6 @@ package main;/*
  */
 
 import javafx.application.Platform;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
@@ -28,7 +26,7 @@ public class WaitingRoom extends VBox{
 
     public LinkedBlockingQueue<Customer> customers = new LinkedBlockingQueue<>();
 
-    public StringProperty status = new SimpleStringProperty(C.WAITING_ROOM_HAS_FREE_PLACES);
+    public String status = C.WAITING_ROOM_HAS_FREE_PLACES;
     // Create a new lock
     private static Lock lock = new ReentrantLock();
 
@@ -54,22 +52,19 @@ public class WaitingRoom extends VBox{
     }
 
     public String getStatus() {
-        return status.getValue();
-    }
-
-    public StringProperty statusProperty() {
         return status;
     }
 
+
     public void setStatus(String status) {
-        this.status.setValue(status);
+        this.status=status;
     }
 
     public void addNewCustomer(Customer customer){
 
         lock.lock();
         try {
-            if (status.getValue() == C.WAITING_ROOM_IS_FULL){
+            if (status == C.WAITING_ROOM_IS_FULL){
                 System.out.println("main.WaitingRoom: room is full");
                 roomIsFullCondition.await();
             }
@@ -86,7 +81,7 @@ public class WaitingRoom extends VBox{
         customer.setStatus(C.CUSTOMER_IS_WAITING);
         repopulate();
         if(customers.size() >= maxCustomer){
-            this.status.setValue(C.WAITING_ROOM_IS_FULL);
+            setStatus(C.WAITING_ROOM_IS_FULL);
         }
     }
 
@@ -132,10 +127,10 @@ public class WaitingRoom extends VBox{
 
         }
         repopulate();
-        if(status.getValue() ==C.WAITING_ROOM_IS_FULL){
+        if(status ==C.WAITING_ROOM_IS_FULL){
 
-                status.setValue(C.WAITING_ROOM_HAS_FREE_PLACES);
-                roomIsFullCondition.signalAll();
+                setStatus(C.WAITING_ROOM_HAS_FREE_PLACES);
+                roomIsFullCondition.signal();
 
 
 
