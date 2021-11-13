@@ -19,18 +19,16 @@ public class CustomerWaitingTask implements Runnable {
 
             public void run() {
 
-                if (customer.status.getValue() == C.CUSTOMER_IS_BEING_SHAVED) {
+                if (customer.getStatus() == C.CUSTOMER_IS_BEING_SHAVED) {
+                    Thread beShavedT = new Thread(new CustomerBeShaved(customer));
+                    beShavedT.setPriority(5);
+                    beShavedT.start();
                     System.out.println("customer end waiting");
                     scheduler.shutdown();
                 }
             }
         };
         scheduler.scheduleAtFixedRate(Shaving, 0, 1, SECONDS);
-
-
-        while (!scheduler.isShutdown()){
-
-        }
     }
     public CustomerWaitingTask(Customer customer){
         this.customer = customer;

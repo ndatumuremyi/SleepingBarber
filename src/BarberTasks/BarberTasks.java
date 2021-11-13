@@ -12,20 +12,11 @@ public class BarberTasks implements Runnable{
         this.barber = barber;
 
 
-        while (true)
-        {
             barber.startSleeping();
             Thread sleepingT = new Thread(new SleepingTask(barber));
-            while (sleepingT.isAlive()) {
+            sleepingT.setPriority(5);
+            sleepingT.start();
 
-            }
-            barber.startShaving();
-            Thread shavingT = new Thread(new ShavingTask(barber));
-            while (shavingT.isAlive()) {
-
-            }
-            barber.finishShaving();
-        }
 //        barberTaskExecutor.execute(new Runnable() {
 //            @Override
 //            public void run() {

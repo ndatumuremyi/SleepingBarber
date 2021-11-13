@@ -21,10 +21,17 @@ public class SleepingTask implements Runnable {
         final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
         final Runnable Shaving = new Runnable() {
 
+            int i = 0;
             public void run() {
+                System.out.println(i++);
 
-                if (barber.status.getValue() != C.BARBER_IS_SLEEPING) {
+                if (barber.getStatus() == C.BARBER_IS_SHAVING) {
+                    barber.startShaving();
                     System.out.println("barber finish Sleeping task ");
+                    Thread shavingT = new Thread(new ShavingTask(barber));
+                    shavingT.setPriority(5);
+                    shavingT.start();
+
                     scheduler.shutdown();
                 }
             }
@@ -32,10 +39,6 @@ public class SleepingTask implements Runnable {
 
 
         scheduler.scheduleAtFixedRate(Shaving, 0, 1, SECONDS);
-
-        while (!scheduler.isShutdown()){
-
-        }
 
     }
 }

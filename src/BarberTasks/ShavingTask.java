@@ -29,6 +29,10 @@ public class ShavingTask implements Runnable {
                 if (shavingRemainingTime < 0) {
                     System.out.println("Timer Over!");
 
+                    barber.startSleeping();
+                    Thread finishT = new Thread(new FinishShavingTask(barber));
+                    finishT.setPriority(5);
+                    finishT.start();
                     scheduler.shutdown();
 //                    barber.status.setValue(C.BARBER_FINISH_SHAVING);
                     System.out.println("finish setting (C.BARBER_FINISH_SHAVING " + barber.getStatus());
@@ -41,10 +45,6 @@ public class ShavingTask implements Runnable {
 
         scheduler.scheduleAtFixedRate(Shaving, 0, 1, SECONDS);
 
-        while (!scheduler.isShutdown()){
-
-        }
-        System.out.println("shavingTask end it work");
     }
     public ShavingTask(Barber barber){
         this.barber = barber;

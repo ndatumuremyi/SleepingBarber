@@ -21,22 +21,10 @@ public class CustomerWorks extends Thread{
 //
 
         Thread enteringT = new Thread(new CustomerEnteringTask(customer, waitingRoom, barber));
+        enteringT.setPriority(5);
         enteringT.start();
-        while (enteringT.isAlive()){
 
-        }
-        Thread waitingT = new Thread(new CustomerWaitingTask(customer));
-        waitingT.start();
-        while (waitingT.isAlive()){
 
-        }
-        Thread beShavedT = new Thread(new CustomerBeShaved(customer));
-        while (beShavedT.isAlive()){
 
-        }
-        Thread leavingT = new Thread(new CustomerLeaving(customer));
-        while (leavingT.isAlive()){
-
-        }
     }
 }

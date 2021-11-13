@@ -19,6 +19,9 @@ public class CustomerBeShaved implements Runnable {
             public void run() {
 
                 if (customer.getStatus() == C.CUSTOMER_IS_LEAVING) {
+                    Thread leavingT = new Thread(new CustomerLeaving(customer));
+                    leavingT.setPriority(5);
+                    leavingT.start();
                     System.out.println("Customer finish to be shaved");
                     scheduler.shutdown();
                 }
@@ -26,10 +29,6 @@ public class CustomerBeShaved implements Runnable {
         };
         scheduler.scheduleAtFixedRate(Shaving, 0, 1, SECONDS);
 
-
-        while (!scheduler.isShutdown()){
-
-        }
     }
     public CustomerBeShaved(Customer customer){
         this.customer = customer;

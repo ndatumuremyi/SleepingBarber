@@ -19,6 +19,9 @@ public class CustomerEnteringTask implements Runnable {
             waitingRoom.addNewCustomer(customer);
             System.out.println("CustomerEnteringTask: customer added");
         }
+        Thread waitingT = new Thread(new CustomerWaitingTask(customer));
+        waitingT.setPriority(5);
+        waitingT.start();
 
 
 
