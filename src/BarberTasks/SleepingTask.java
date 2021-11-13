@@ -23,7 +23,9 @@ public class SleepingTask implements Runnable {
 
             int i = 0;
             public void run() {
-                System.out.println(i++);
+                System.out.println(i);
+                barber.setSleepingTime(i);
+                i++;
 
                 if (barber.getStatus() == C.BARBER_IS_SHAVING) {
                     barber.startShaving();

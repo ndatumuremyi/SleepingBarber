@@ -23,6 +23,7 @@ public class ShavingTask implements Runnable {
             public void run() {
 
 
+                barber.setShavingRemainingTime(shavingRemainingTime);
                 System.out.println(shavingRemainingTime);
                 shavingRemainingTime--;
 
