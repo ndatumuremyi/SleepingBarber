@@ -13,7 +13,15 @@ import javafx.beans.property.StringProperty;
  * @author paterneN
  */
 public class Customer{
-    public Customer(){}
+    private static int idGenerator = 0;
+    private int id = 0;
+    public Customer(){
+        id = ++idGenerator;
+    }
+
+    public int getId() {
+        return id;
+    }
     public String status = C.CUSTOMER_IS_ENTERING;
 
 

@@ -5,6 +5,8 @@ package main;/*
  */
 
 import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
@@ -24,6 +26,7 @@ public class WaitingRoom extends HBox {
     private int width = 130;
 
     private int maxCustomer = 4;
+    IntegerProperty peopleThatAreOutSide = new SimpleIntegerProperty(0);
 
     public LinkedBlockingQueue<Customer> customers = new LinkedBlockingQueue<>();
 
@@ -67,6 +70,7 @@ public class WaitingRoom extends HBox {
         try {
             if (status == C.WAITING_ROOM_IS_FULL){
                 System.out.println("main.WaitingRoom: room is full");
+                setPeopleThatAreOutSide(getPeopleThatAreOutSide()+1);
                 roomIsFullCondition.await();
             }
 
@@ -131,6 +135,9 @@ public class WaitingRoom extends HBox {
             if(status ==C.WAITING_ROOM_IS_FULL){
 
                 setStatus(C.WAITING_ROOM_HAS_FREE_PLACES);
+
+                if (getPeopleThatAreOutSide() != 0)
+                    setPeopleThatAreOutSide(getPeopleThatAreOutSide()-1);
                 roomIsFullCondition.signal();
 
 
@@ -143,5 +150,15 @@ public class WaitingRoom extends HBox {
 
     }
 
+    public int getPeopleThatAreOutSide() {
+        return peopleThatAreOutSide.getValue();
+    }
 
+    public IntegerProperty peopleThatAreOutSideProperty() {
+        return peopleThatAreOutSide;
+    }
+
+    public void setPeopleThatAreOutSide(int peopleThatAreOutSide) {
+        this.peopleThatAreOutSide.setValue(peopleThatAreOutSide);
+    }
 }
