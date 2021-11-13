@@ -4,10 +4,6 @@ package main;/*
  * and open the template in the editor.
  */
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 
 
 /**

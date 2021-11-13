@@ -1,28 +1,14 @@
 package main;
 
-import barberTasks.FinishShavingTask;
-import barberTasks.ShavingTask;
-import barberTasks.SleepingTask;
-import customerTasks.CustomerBeShaved;
-import customerTasks.CustomerEnteringTask;
-import customerTasks.CustomerLeaving;
-import customerTasks.CustomerWaitingTask;
 import javafx.application.Application;
-import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.*;
 import javafx.stage.Stage;
-
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 /**
  *
@@ -34,7 +20,7 @@ public class BarberShop extends Application {
     SleepingPlace sleepingPlace = new SleepingPlace();;
     VBox toolsBox = toolsBox = new VBox();
     Button addNewCustomer = new Button("Add new customer");
-    HBox house = new HBox();
+    StackPane house = new StackPane();
     Scene scene;
 
 
@@ -43,13 +29,27 @@ public class BarberShop extends Application {
 
 
         toolsBox.getChildren().add(addNewCustomer);
+        sleepingPlace.setAlignment(Pos.BOTTOM_LEFT);
+        shavingPlace.setAlignment(Pos.BOTTOM_LEFT);
 
 
+        int width = 1500;
+        int height = 675;
+        ImageView back = new ImageView(new Image("barberHouse.png"));
+        back.setFitWidth(width);
+        back.setFitHeight(height);
+        house.getChildren().add(back);
+//        house.setMinSize(width,height);
+//        house.setMaxSize(width,height);
 
-        house.setSpacing(200);
-        house.setPadding(new Insets(80,23,80,23));
-        waitingRoom.setAlignment(Pos.CENTER);
-        house.getChildren().addAll(sleepingPlace,shavingPlace, waitingRoom, toolsBox);
+        sleepingPlace.setAlignment(Pos.BOTTOM_LEFT);
+        shavingPlace.setAlignment(Pos.BOTTOM_CENTER);
+        waitingRoom.setAlignment(Pos.BOTTOM_RIGHT);
+        toolsBox.setAlignment(Pos.BASELINE_RIGHT);
+        house.getChildren().addAll(sleepingPlace,shavingPlace,waitingRoom, toolsBox);
+//        whole.setBackground(new Background(new BackgroundImage(new Image("background.png"), BackgroundRepeat.NO_REPEAT,BackgroundRepeat.NO_REPEAT,BackgroundPosition.CENTER,new BackgroundSize(1500,height,false,false,true,true))));
+
+//        whole.setBackground(new Background(new BackgroundImage(new Image("background.png"), BackgroundRepeat.NO_REPEAT,BackgroundRepeat.NO_REPEAT,BackgroundPosition.CENTER,BackgroundSize.DEFAULT)));
 
         scene = new Scene(house);
 
