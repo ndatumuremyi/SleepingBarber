@@ -1,8 +1,4 @@
-package main;/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+package main;
 
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
@@ -55,10 +51,6 @@ public class WaitingRoom extends HBox {
 
     }
 
-    public String getStatus() {
-        return status;
-    }
-
 
     public void setStatus(String status) {
         this.status=status;
@@ -83,18 +75,11 @@ public class WaitingRoom extends HBox {
         }
 
         customers.add(customer);
-        customer.setStatus(C.CUSTOMER_IS_WAITING);
+//        customer.setStatus(C.CUSTOMER_IS_WAITING);
         repopulate();
         if(customers.size() >= maxCustomer){
             setStatus(C.WAITING_ROOM_IS_FULL);
         }
-    }
-
-    private boolean isWaitingRoomFull() {
-        if(maxCustomer <= customers.size()){
-            return true;
-        }
-        return false;
     }
 
     private void repopulate() {

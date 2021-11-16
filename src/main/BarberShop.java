@@ -7,7 +7,6 @@ import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.control.Skin;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -30,8 +29,6 @@ public class BarberShop extends Application {
     Label shavingTime = new Label("shaving remaining time: 0");
     StackPane shavingT = new StackPane(shavingTime);
 
-    Label sleepingTime = new Label("sleeping time: 0");
-    StackPane sleepingT = new StackPane(sleepingTime);
 
     Label peopleOutSite = new Label("people that will come back: 0");
     StackPane peopleOutSide =  new StackPane(peopleOutSite);
@@ -39,11 +36,9 @@ public class BarberShop extends Application {
     @Override
     public void start(Stage primaryStage) {
 
-
-        sleepingTime.setFont(Font.font(20));
         shavingTime.setFont(Font.font(20));
         peopleOutSite.setFont(Font.font(20));
-        toolsBox.getChildren().addAll(addNewCustomer, sleepingT, shavingT, peopleOutSide);
+        toolsBox.getChildren().addAll(addNewCustomer, shavingT, peopleOutSide);
         sleepingPlace.setAlignment(Pos.BOTTOM_LEFT);
         shavingPlace.setAlignment(Pos.BOTTOM_LEFT);
 
@@ -101,22 +96,13 @@ public class BarberShop extends Application {
         });
 
     }
-    public void updateSleepingTime(int newValue){
-        Platform.runLater(new Runnable() {
-            @Override
-            public void run() {
-                sleepingT.getChildren().clear();
-                Label sleepingTime = new Label("sleeping time: "+ newValue);
-                sleepingTime.setFont(Font.font(20));
-                sleepingT.getChildren().add(sleepingTime);
-
-            }
-        });
-    }
     public void updatePeopleOutside(int newValue){
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
+                if(newValue < 0){
+                    return;
+                }
                 Label peopleOutSite = new Label("people that will come back: "+newValue);
                 peopleOutSite.setFont(Font.font(20));
                 peopleOutSide.getChildren().clear();

@@ -1,14 +1,16 @@
 package main;
 
-import barberTasks.BarberTasks;
-import customerTasks.*;
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
 
-public class Main implements Runnable {
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
+
+public class Main extends Thread{
     WaitingRoom waitingRoom;
     Barber barber;
 
@@ -17,44 +19,51 @@ public class Main implements Runnable {
     SleepingPlace sleepingPlace;
     BarberShop barberShop;
 
+    private static Lock lock = new ReentrantLock();
+
+    // Create a condition
+    private static Condition requestShavingCondition = lock.newCondition();
+    private static Condition finishShavingCondition = lock.newCondition();
+
     @Override
     public void run() {
-        barber = new Barber(waitingRoom, sleepingPlace, shavingPlace);
+        super.run();
 
-        BarberTasks barberTasks = new BarberTasks(barber);
-        Thread barberWorks = new Thread(barberTasks);
-        barberWorks.setPriority(5);
-        barberWorks.start();
+        barber = new Barber(this);
+        barber.start();
+
 
 
         addNewCustomer.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 System.out.println("main.BarberShop: hello, new customer need to be shaved");
-                Customer customer = new Customer();
-                CustomerWorks customerWorks = new CustomerWorks(customer,waitingRoom,barber);
-                customerWorks.start();
-
-                // Create a fixed thread pool with only 1 threads for each new customer
-
-
+                Customer customer = new Customer(Main.this);
+                customer.start();
 
             }
         });
-
-
-
-
-        this.barber.shavingRemainingTimeProperty().addListener(new InvalidationListener() {
+        barber.statusProperty().addListener(new InvalidationListener() {
             @Override
             public void invalidated(Observable observable) {
-                barberShop.updateShavingTime(barber.getShavingRemainingTime());
-            }
-        });
-        this.barber.sleepingTimeProperty().addListener(new InvalidationListener() {
-            @Override
-            public void invalidated(Observable observable) {
-                barberShop.updateSleepingTime(barber.getSleepingTime());
+                switch (barber.getStatus()){
+                    case C.BARBER_IS_SLEEPING:
+                    {
+                        sleepingPlace.addBarber();
+                        shavingPlace.removeBarberAndCustomer();
+                        break;
+                    }
+                    case C.BARBER_IS_SHAVING:
+                    {
+                        sleepingPlace.removeBarber();
+                        shavingPlace.addBarberAndCustomer();
+                        break;
+                    }
+                    default:
+                    {
+                        break;
+                    }
+                }
             }
         });
         this.waitingRoom.peopleThatAreOutSideProperty().addListener(new InvalidationListener() {
@@ -63,10 +72,13 @@ public class Main implements Runnable {
                 barberShop.updatePeopleOutside(waitingRoom.getPeopleThatAreOutSide());
             }
         });
+        this.barber.shavingRemainingTimeProperty().addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                barberShop.updateShavingTime(barber.getShavingRemainingTime());
+            }
+        });
 
-
-
-        System.out.println("start Ending");
     }
     Main(WaitingRoom waitingRoom,SleepingPlace sleepingPlace, ShavingPlace shavingPlace, Button addNewCustomer, BarberShop barberShop ){
         this.barberShop = barberShop;
@@ -75,5 +87,30 @@ public class Main implements Runnable {
         this.addNewCustomer = addNewCustomer;
         this.waitingRoom = waitingRoom;
 
+    }
+
+    public void requestToEnter(Customer customer) {
+
+        System.out.println("Main requestToEnter() start");
+        waitingRoom.addNewCustomer(customer);
+        System.out.println("Main requestToEnter() ends");
+    }
+
+    public void requestToBeShaved() {
+        lock.lock();
+
+        try {
+            Customer customer = waitingRoom.getNextCustomer();
+            barber.shaveCustomer(customer);
+
+            barber.canCustomerLeave();
+
+            barber.readyToReceiveNewCustomer();
+            System.out.println("customer leaving");
+
+
+        } finally {
+            lock.unlock();
+        }
     }
 }

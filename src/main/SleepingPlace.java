@@ -1,10 +1,6 @@
 package main;
 
 import javafx.application.Platform;
-import javafx.beans.InvalidationListener;
-import javafx.beans.Observable;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
@@ -15,12 +11,6 @@ public class SleepingPlace extends StackPane {
     public String status = C.SLEEPING_PLACE_HAS_BARBER ;
     ImageView emptyChair;
     ImageView sleeping;
-//    main.Barber barber;
-
-
-    public String getStatus() {
-        return status;
-    }
 
 
     public void setStatus(String status) {

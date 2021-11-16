@@ -1,123 +1,160 @@
-package main;/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+package main;
 
-
+import javafx.beans.Observable;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  *
  * @author paterneN
  */
 
-public class Barber{
-    public String status = C.BARBER_IS_SLEEPING;
+public class Barber extends Thread{
+    Main main;
     int shavingTime = 10;
+
+
+
+
+
+
+    private StringProperty status = new SimpleStringProperty(C.BARBER_IS_SLEEPING);
+    private Boolean stillShaving = false;
     private IntegerProperty shavingRemainingTime = new SimpleIntegerProperty(0);
-    IntegerProperty sleepingTime = new SimpleIntegerProperty(0);
-    WaitingRoom waitingRoom; // will help us to get next customer.
-    Customer currentShavedCustomer;
-    ShavingPlace shavingPlace;
-    SleepingPlace sleepingPlace;
+
+    private Lock lock = new ReentrantLock();
+    private Condition shaving = lock.newCondition();
+    private Condition startShavingCondition = lock.newCondition();
+    private Condition readyToReceiveCondition = lock.newCondition();
 
 
-
-    public Barber(WaitingRoom waitingRoom, SleepingPlace sleepingPlace, ShavingPlace shavingPlace){
-        this.waitingRoom = waitingRoom;
-        this.shavingPlace = shavingPlace;
-        this.sleepingPlace = sleepingPlace;
-
+    public String getStatus() {
+        return status.get();
     }
 
-    public int getSleepingTime() {
-        return sleepingTime.getValue();
+    public StringProperty statusProperty() {
+        return status;
     }
 
-    public IntegerProperty sleepingTimeProperty() {
-        return sleepingTime;
+    public void setStatus(String status) {
+        this.status.set(status);
     }
 
-    public void setSleepingTime(int sleepingTime) {
-        this.sleepingTime.setValue(sleepingTime);
+    public Barber(Main main){
+        this.main = main;
     }
 
-    public int getShavingRemainingTime() {
-        return shavingRemainingTime.getValue();
+    @Override
+    public void run() {
+        super.run();
+
+        while (true){
+
+            System.out.println("Barber top");
+            lock.lock();
+            try {
+                startShavingCondition.await();
+                setStatus(C.BARBER_IS_SHAVING);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            finally {
+                lock.unlock();
+            }
+            stillShaving = true;
+            this.shavingRemainingTime.setValue(this.shavingTime);
+            final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
+            Runnable Shaving = new Runnable() {
+                public void run() {
+                    System.out.println(shavingRemainingTime);
+                    shavingRemainingTime.setValue(shavingRemainingTime.getValue() - 1);
+                    if (shavingRemainingTime.getValue() < 0) {
+                        lock.lock();
+                        try {
+
+                            scheduler.shutdown();
+                            stillShaving = false;
+                            shaving.signalAll();
+                            System.out.println("Timer Over!");
+                            System.out.println("finish setting (C.BARBER_FINISH_SHAVING ");
+
+                            setStatus(C.BARBER_IS_SLEEPING);
+                        }finally {
+                            lock.unlock();
+                        }
+
+                    }
+
+                }
+            };
+//            this.shavingRemainingTime this.shavingTime;
+            scheduler.scheduleAtFixedRate(Shaving, 0L, 1L, TimeUnit.SECONDS);
+            System.out.println("Barber Bottom");
+
+
+        }
+    }
+
+
+    public void canCustomerLeave() {
+        lock.lock();
+        System.out.println("Barber: canCustomerLeave() Start");
+
+        try {
+            shaving.await();
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        finally {
+            lock.unlock();
+        }
+        System.out.println("barber: canCustomerLeave() ends");
+    }
+    public void shaveCustomer(Customer customer){
+        lock.lock();
+        if(stillShaving == true){
+            try {
+                readyToReceiveCondition.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        try {
+            startShavingCondition.signal();
+        }finally {
+            lock.unlock();
+        }
+    }
+    public void readyToReceiveNewCustomer(){
+
+        lock.lock();
+        try {
+            readyToReceiveCondition.signalAll();
+            System.out.println("Function readyToReceiveNewCustomer run");
+
+
+        }
+        finally {
+            lock.unlock();
+        }
     }
 
     public IntegerProperty shavingRemainingTimeProperty() {
         return shavingRemainingTime;
     }
 
-    public void setShavingRemainingTime(int shavingRemainingTime) {
-        this.shavingRemainingTime.setValue(shavingRemainingTime);
-    }
-
-    public boolean isThereOtherCustomer(){
-        if(this.waitingRoom.getNumberOfCustomersWaiting() == 0){
-            return false;
-        }
-        else {
-            return true;
-        }
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-
-    public void setStatus(String status) {
-        this.status=status;
-    }
-
-    public int getShavingTime() {
-        return shavingTime;
-    }
-
-    public Customer getCurrentShavedCustomer() {
-        return currentShavedCustomer;
-    }
-
-    public void setCurrentShavedCustomer(Customer currentShavedCustomer) {
-        this.currentShavedCustomer = currentShavedCustomer;
-        this.setStatus(C.BARBER_IS_SHAVING);
-
-    }
-    public void startSleeping(){
-        setStatus(C.BARBER_IS_SLEEPING);
-        shavingPlace.removeBarberAndCustomer();
-        sleepingPlace.addBarber();
-    }
-    public void startShaving(){
-        setStatus(C.BARBER_IS_SHAVING);
-        currentShavedCustomer.setStatus(C.CUSTOMER_IS_BEING_SHAVED);
-        shavingPlace.addBarberAndCustomer();
-        sleepingPlace.removeBarber();
-    }
-    public void finishShaving(){
-        setStatus(C.BARBER_FINISH_SHAVING);
-        if(currentShavedCustomer != null){
-            currentShavedCustomer.startLeaving();
-        }
-
-
-
-        //take new customer
-
-        System.out.println("testing" + currentShavedCustomer);
-        currentShavedCustomer = waitingRoom.getNextCustomer();
-        System.out.println("testing" + currentShavedCustomer);
-        if (currentShavedCustomer== null) {
-            startSleeping();
-            System.out.println("Barber: barber got to sleep");
-
-        } else {
-            currentShavedCustomer.startBeingShaved();
-            startShaving();
-        }
+    public int getShavingRemainingTime() {
+        return shavingRemainingTime.getValue();
     }
 }
