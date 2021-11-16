@@ -5,21 +5,15 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-
 public class ShavingPlace extends StackPane {
     private int height = 300;
     private int widthEmpty = 310;
     private int WidthShaving = 396;
-    // Create a new lock
-    private static Lock lock = new ReentrantLock();
 
     String status = C.SHAVING_PLACE_IS_EMPTY ;
     ImageView emptyChair;
     ImageView shaving;
 
-    Customer customer ;
 
     ShavingPlace() {
         emptyChair = new ImageView(new Image("emptyChair.png"));
@@ -32,23 +26,6 @@ public class ShavingPlace extends StackPane {
 
         getChildren().add(emptyChair);
     }
-    public void setState(String state){
-        status=state;
-    }
-
-    public Customer getCustomer() {
-        return customer;
-    }
-
-    public void setCustomer(Customer customer) {
-        this.customer = customer;
-        status=C.SHAVING_PLACE_HAS_CUSTOMER;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
 
     public void setStatus(String status) {
         this.status=status;
