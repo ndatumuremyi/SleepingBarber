@@ -2,6 +2,8 @@ package main;
 
 import javafx.beans.InvalidationListener;
 import javafx.beans.Observable;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.Button;
@@ -14,10 +16,13 @@ public class Main extends Thread{
     WaitingRoom waitingRoom;
     Barber barber;
 
+    CustomerGenerator customerGenerator;
+    Button disableCustomerGeneration;
     Button addNewCustomer;
     ShavingPlace shavingPlace;
     SleepingPlace sleepingPlace;
     BarberShop barberShop;
+    BooleanProperty disableCustomerGenerationStatus = new SimpleBooleanProperty(false);
 
     private static Lock lock = new ReentrantLock();
 
@@ -32,7 +37,7 @@ public class Main extends Thread{
         barber = new Barber(this);
         barber.start();
 
-        CustomerGenerator customerGenerator = new CustomerGenerator(this);
+        customerGenerator = new CustomerGenerator(this);
         customerGenerator.start();
 
 
@@ -44,6 +49,12 @@ public class Main extends Thread{
                 Customer customer = new Customer(Main.this);
                 customer.start();
 
+            }
+        });
+        disableCustomerGeneration.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                disableCustomerGenerationStatus.setValue(!disableCustomerGenerationStatus.getValue());
             }
         });
         barber.statusProperty().addListener(new InvalidationListener() {
@@ -81,15 +92,29 @@ public class Main extends Thread{
                 barberShop.updateShavingTime(barber.getShavingRemainingTime());
             }
         });
+        this.disableCustomerGenerationStatus.addListener(new InvalidationListener() {
+            @Override
+            public void invalidated(Observable observable) {
+                if(disableCustomerGenerationStatus.getValue()){
+                        customerGenerator.takeBreak();
+                    System.out.println("CustomerGeneration is disabled !");
+                }
+                else {
+                    customerGenerator.goToWork();
+                    System.out.println("CustomerGeneration is enabled !");
+                }
+                barberShop.ChangeTextForDisableCustomerGenetation(disableCustomerGenerationStatus.getValue());
+            }
+        });
 
     }
-    Main(WaitingRoom waitingRoom,SleepingPlace sleepingPlace, ShavingPlace shavingPlace, Button addNewCustomer, BarberShop barberShop ){
+    Main(WaitingRoom waitingRoom,SleepingPlace sleepingPlace, ShavingPlace shavingPlace, Button addNewCustomer, Button disableCustomerAutoGenerate, BarberShop barberShop ){
         this.barberShop = barberShop;
         this.sleepingPlace = sleepingPlace;
         this.shavingPlace = shavingPlace;
         this.addNewCustomer = addNewCustomer;
         this.waitingRoom = waitingRoom;
-
+        this.disableCustomerGeneration = disableCustomerAutoGenerate;
     }
 
     public void requestToEnter(Customer customer) {

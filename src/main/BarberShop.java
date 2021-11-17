@@ -23,6 +23,7 @@ public class BarberShop extends Application {
     SleepingPlace sleepingPlace = new SleepingPlace();;
     VBox toolsBox  = new VBox();
     Button addNewCustomer = new Button("Add new customer");
+    Button disableCustomerGeneration = new Button("Disable customer generation");
     StackPane house = new StackPane();
     Scene scene;
 
@@ -38,7 +39,8 @@ public class BarberShop extends Application {
 
         shavingTime.setFont(Font.font(20));
         peopleOutSite.setFont(Font.font(20));
-        toolsBox.getChildren().addAll(addNewCustomer, shavingT, peopleOutSide);
+        toolsBox.getChildren().addAll(disableCustomerGeneration,addNewCustomer, shavingT, peopleOutSide);
+        toolsBox.setSpacing(9);
         sleepingPlace.setAlignment(Pos.BOTTOM_LEFT);
         shavingPlace.setAlignment(Pos.BOTTOM_LEFT);
 
@@ -66,7 +68,7 @@ public class BarberShop extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        Main main = new Main(waitingRoom, sleepingPlace, shavingPlace, addNewCustomer, this);
+        Main main = new Main(waitingRoom, sleepingPlace, shavingPlace, addNewCustomer, disableCustomerGeneration, this);
         Thread mainThread = new Thread(main);
         mainThread.start();
 
@@ -87,6 +89,9 @@ public class BarberShop extends Application {
         Platform.runLater(new Runnable() {
             @Override
             public void run() {
+                if(newValue < 0){
+                    return;
+                }
                 Label shavingTime = new Label("shaving remaining time: " + newValue);
 
                 shavingTime.setFont(Font.font(20));
@@ -111,4 +116,12 @@ public class BarberShop extends Application {
         });
     }
 
+    public void ChangeTextForDisableCustomerGenetation(Boolean disabled) {
+        if(!disabled){
+            disableCustomerGeneration.setText("Disable customer generation");
+        }
+        else {
+            disableCustomerGeneration.setText("Enable customer generation");
+        }
+    }
 }
