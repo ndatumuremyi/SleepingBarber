@@ -32,6 +32,9 @@ public class Main extends Thread{
         barber = new Barber(this);
         barber.start();
 
+        CustomerGenerator customerGenerator = new CustomerGenerator(this);
+        customerGenerator.start();
+
 
 
         addNewCustomer.setOnAction(new EventHandler<ActionEvent>() {
