@@ -69,8 +69,7 @@ public class BarberShop extends Application {
         primaryStage.show();
 
         Main main = new Main(waitingRoom, sleepingPlace, shavingPlace, addNewCustomer, disableCustomerGeneration, this);
-        Thread mainThread = new Thread(main);
-        mainThread.start();
+        main.start();
 
 
 

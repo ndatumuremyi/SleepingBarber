@@ -34,7 +34,7 @@ public class Main extends Thread{
     public void run() {
         super.run();
 
-        barber = new Barber(this);
+        barber = new Barber();
         barber.start();
 
         customerGenerator = new CustomerGenerator(this);

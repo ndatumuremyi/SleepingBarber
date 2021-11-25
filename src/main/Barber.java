@@ -19,7 +19,7 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 
 public class Barber extends Thread{
-    Main main;
+//    Main main;
     int shavingTime = 10;
 
 
@@ -49,8 +49,8 @@ public class Barber extends Thread{
         this.status.set(status);
     }
 
-    public Barber(Main main){
-        this.main = main;
+    public Barber(){
+//        this.main = main;
     }
 
     @Override
